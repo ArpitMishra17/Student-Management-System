@@ -1,0 +1,28 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Update Details</title>
+    <link rel="stylesheet" href="{% static 'styles.css' %}">
+</head>
+<body>
+    <h1>Update details</h1>
+    <form method="POST" enctype="multipart/form-data">
+        {% csrf_token %} 
+        <label>Aadhar</label>
+        <input type="text" placeholder="Enter Aadhar number " name="student_aadhar" value="{{student.aadhar}}">
+        <label>Address</label>
+        <input type="text" placeholder="Enter Address " name="student_address" value="{{student.address}}">
+        <label>Profile Picture</label>
+        <input type="file" name="student_profile_picture">
+
+        <button type="submit">Update</button>
+    </form>
+    <div class="button-container">
+        
+            <a href="{% url 'student_home' %}">Back to Home</a>
+        
+        
+    </div>
+</body>
+</html>

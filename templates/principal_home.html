@@ -1,0 +1,649 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Principal Home</title>
+    <link rel="stylesheet" href="{% static 'styles.css' %}">
+    <style>
+        /* Table styling */
+        table {
+            width: 100%;
+            margin-top: 20px;
+            border-collapse: collapse;
+        }
+        th, td {
+            padding: 10px;
+            border: 1px solid #ddd;
+            text-align: left;
+        }
+        th {
+            background-color: #f2f2f2;
+        }
+
+        /* Hide tables initially */
+        .table-container {
+            display: none;
+        }
+    </style>
+    <script>
+        // JavaScript to toggle visibility of the tables
+        function toggleTable(tableId) {
+            var table = document.getElementById(tableId);
+            if (table.style.display === "none" || table.style.display === "") {
+                table.style.display = "block";
+            } else {
+                table.style.display = "none";
+            }
+        }
+    </script>
+</head>
+<body>
+    <div class="header">
+        <h1>Welcome Principal</h1>
+        <div class="user-info">
+            Logged in as : {{ principal.user.name }}
+        </div>
+    </div>
+    <div class="principal-info">
+        <ul>
+            <li><a href="javascript:void(0);" onclick="toggleTable('teachers-table')">Number of Teachers: {{ teacher_count }}</a><a> <button class="add-teacher-button">+</button></a></li>
+            <li><a href="javascript:void(0);" onclick="toggleTable('students-table')">Number of Students: {{ student_count }}</a><a> <button class="add-student-button">+</button></a></li>
+            <li><a href="javascript:void(0);" onclick="toggleTable('classes-table')">Number of Classes: {{ class_count }}</a><a> <button class="add-class-button">+</button></a></li>
+            <li><a href="javascript:void(0);" onclick="toggleTable('sections-table')">Number of Sections: {{ section_count }}</a><a> <button class="add-section-button">+</button></a></li>
+            <li><a href="javascript:void(0);" onclick="toggleTable('subjects-table')">Number of Subjects: {{ subject_count }}</a><a> <button class="add-subject-button">+</button></a></li>
+        </ul>
+    </div>
+
+    <div class="button-container">
+        <a href="{% url 'user_login' %}">Logout</a>
+    </div>
+
+    <!-- Tables below the Logout Button -->
+
+    <!-- Teachers Table -->
+    <div id="teachers-table" class="table-container">
+        <table>
+            <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Gender</th>
+                    <th>Subjects</th>
+                    <th>Class</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for teacher in teachers %}
+                    <tr>
+                        <td>{{ teacher.user.name }}</td>
+                        <td>{{ teacher.gender }}</td>
+                        <td>
+                            {% for subject in teacher.subjects.all %}
+                                {{ subject.name }}{% if not forloop.last %}, {% endif %}
+                            {% endfor %}
+                        </td>
+                        <td>
+                            {% for class_ in teacher.class_name.all %}
+                                {{ class_.name }}{% if not forloop.last %}, {% endif %}
+                            {% endfor %}
+                        </td>
+                        
+                        <td><button class="update-teacher-button">Update</button></td>
+                        <td><button class="delete-teacher-button">Delete</button></td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Students Table -->
+    <div id="students-table" class="table-container">
+        <table>
+            <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Class</th>
+                    <th>Section</th>
+                    <th>Email</th>
+                    <th>Phone Number</th>
+                    <th>Subjects</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for student in students %}
+                    <tr>
+                        <td>{{ student.user.name }}</td>
+                        <td>{{ student.class_name.name }}</td>
+                        <td>{{ student.sections.name }}</td>
+                        <td>{{ student.user.email }}</td>
+                        <td>{{ student.user.phone_number}}</td>
+                        <td>
+                            {% for subject in student.subjects.all %}
+                                {{ subject.name }}{% if not forloop.last %}, {% endif %}
+                            {% endfor %}
+                        </td>
+                       
+                        <td><button class="update-button update-student-button" 
+                            data-id="{{student.id}}" 
+                            data-name="{{student.user.name}}" 
+                            data-class_name="{{student.class_name.id}}" data-section="{{student.sections.id}}" data-email="{{student.user.email}}" data-phone_number="{{student.user.phone_number}}"
+                        >Update</button></td>
+                        <td><button class="delete-student-button" data-id="{{student.id}}">Delete</button></td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Classes Table -->
+    <div id="classes-table" class="table-container">
+        <table>
+            <thead>
+                <tr>
+                    <th>Class Name</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for class_ in classes %}
+                    <tr>
+                        <td>
+                            <a href="{% url 'class_students' class_.id%}"
+                            class="class-link">{{ class_.name }}</a>
+                        </td>
+                       
+                        <td><button class="update-button update-class-button" data-id="{{class_.id}}" data-name="{{class_.name}}">Update</button></td>
+                        <td><button class="delete-button delete-class-button">Delete</button></td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Sections Table -->
+    <div id="sections-table" class="table-container">
+        <table>
+            <thead>
+                <tr>
+                    <th>Section Name</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for section in sections %}
+                    <tr>
+                        <td>{{ section.name }}</td>
+                        
+                        <td><button class="update-button update-section-button">Update</button></td>
+                        <td><button class="delete-button delete-section-button">Delete</button></td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Subjects Table -->
+    <div id="subjects-table" class="table-container">
+        <table>
+            <thead>
+                <tr>
+                    <th>Subject Name</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for subject in subjects %}
+                    <tr>
+                        <td>{{ subject.name }}</td>
+                        
+                        <td><button class="update-subject-button">Update</button></td>
+                        <td><button class="delete-subject-button">Delete</button></td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <div id="updateStudentModal" class="modal">
+        <div class="modal-content">
+            <span class="close-btn close-update-modal">&times;</span>
+            <h2>Update Student</h2>
+            <form id="updateForm">
+                {% csrf_token %}
+
+                <input type="hidden" id="update-student-id">
+
+                <label for="update-name">Name:</label>
+                <input type="text" id="update-name" name="student_name"><br>
+
+                <label for="update-class_name">Class:</label>
+                <select id="update-class_name" name="student_class_name">
+                    {% for class_option in classes %}
+                     <option value="{{ class_option.id }}" >
+                    {{ class_option.name }}
+                    </option>
+                    {% endfor %}
+                </select><br>
+
+                <label for="update-section">Section:</label>
+                <select id="update-section" name="student_section">
+                    {% for section_option in sections%}
+                    <option value="{{ section_option.id }}" >{{section_option.name}}</option>
+                    {% endfor %}</select><br>
+
+                <label for="update-email">Email:</label>
+                <input type="text" id="update-email" name="email"><br>
+                <label for="update-phone_number">Phone Number:</label>
+                <input type="text" id="update-phone_number" name="phone_number"><br>
+                
+                <button type="submit">Update</button>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        
+        var updateButtons = document.querySelectorAll(".update-student-button");
+        var updateModal = document.getElementById("updateStudentModal");
+        var updatecloseBtn = document.querySelector(".close-update-modal");
+        var updateForm = document.getElementById("updateForm");
+
+        
+        updateButtons.forEach(button => {
+            button.addEventListener("click", function() {
+                const studentId = this.dataset.id;
+                const name = this.dataset.name;
+                const classId = this.dataset.class_name;
+                const sectionId = this.dataset.section;
+                const email= this.dataset.email;
+                const phone_number=this.dataset.phone_number
+                
+
+                document.getElementById("update-student-id").value = studentId;
+                document.getElementById("update-name").value = name;
+                document.getElementById("update-class_name").value = classId;
+                document.getElementById("update-section").value = sectionId;
+                document.getElementById("update-email").value=email
+                document.getElementById("update-phone_number").value=phone_number
+                
+
+                updateModal.style.display = "block";
+            });
+        });
+
+        
+        updatecloseBtn.addEventListener("click", function() {
+            updateModal.style.display = "none";
+        });
+
+       
+        window.addEventListener("click", function(event) {
+            if (event.target === updateModal) {
+                updateModal.style.display = "none";
+            }
+        });
+
+        
+        updateForm.addEventListener("submit", function(e) {
+            e.preventDefault();
+
+            const studentId = document.getElementById("update-student-id").value;
+            const name = document.getElementById("update-name").value;
+            const classId = document.getElementById("update-class_name").value;
+            const sectionId = document.getElementById("update-section").value;
+            const email = document.getElementById("update-email").value
+            const phone_number=document.getElementById("update-phone_number").value
+            
+
+            const formData = new FormData();
+            formData.append("student_id", studentId);
+            formData.append("name", name);
+            formData.append("class_name", classId);
+            formData.append("section", sectionId);
+            formData.append("email",email)
+            formData.append("phone_number",phone_number)
+            
+            formData.append("csrfmiddlewaretoken", document.querySelector('[name="csrfmiddlewaretoken"]').value);
+            
+
+            const request = new XMLHttpRequest();
+            request.open("POST", "{% url 'update_principal_student_ajax' %}", true);
+            request.onreadystatechange = function() {
+                if (request.readyState === XMLHttpRequest.DONE) {
+                    if (request.status === 200) 
+                    {
+                        const response = JSON.parse(request.responseText);
+                        if (response.success) 
+                        {
+                            alert("Student details updated successfully");
+                            window.location.reload();  
+                        }
+                        else 
+                        {
+                            alert("Error updating student details");
+                        }
+                    } 
+                    else
+                    {
+                        alert("Error occurred while updating student");
+                    }
+                }
+            };
+            request.send(formData);
+        });
+
+                    // Add event listeners to all delete buttons
+        var deleteButtons = document.querySelectorAll(".delete-student-button");
+        console.log("Delete buttons found:", deleteButtons);
+
+        deleteButtons.forEach(button => {
+            button.addEventListener("click", function () {
+                
+                const studentId = this.dataset.id; // Get the student ID from the data-id attribute
+
+                // Ask for confirmation
+                if (!confirm("Are you sure you want to delete this student?")) {
+                    return;
+                }
+
+                // CSRF token
+                const csrfToken = document.querySelector('[name="csrfmiddlewaretoken"]').value;
+
+                // Send the AJAX DELETE request
+                fetch("{% url 'delete_student' 0 %}".replace('0', studentId), {
+                    method: "POST",
+                    headers: {
+                        "X-CSRFToken": csrfToken,
+                        "Content-Type": "application/json"
+                    }
+                })
+                .then(response => {
+                    if (response.ok) {
+                        // Remove the student row from the table
+                        const studentRow = button.closest("tr");
+                        studentRow.remove();
+
+                        alert("Student deleted successfully!");
+                    } else {
+                        throw new Error("Failed to delete the student.");
+                    }
+                })
+                .catch(error => {
+                    console.error("Error:", error);
+                    alert("An error occurred while trying to delete the student.");
+                });
+            });
+        });
+
+        
+    </script>
+
+
+    <div id="addStudentModal" class="modal">
+        <div class="modal-content">
+            <span class="close-btn close-add-modal">&times;</span>
+            <h2>Add Student</h2>
+            <form id="addForm">
+                {% csrf_token %}
+
+
+                <label for="add-name">Name:</label>
+                <input type="text" id="add-name" name="student_name"><br>
+
+                <label for="add-class_name">Class:</label>
+                <select id="add-class_name" name="student_class_name">
+                    {% for class_option in classes %}
+                     <option value="{{ class_option.id }}" >
+                    {{ class_option.name }}
+                    </option>
+                    {% endfor %}
+                </select><br>
+
+                <label for="add-section">Section:</label>
+                <select id="add-section" name="student_section">
+                    {% for section_option in sections%}
+                    <option value="{{ section_option.id }}" >{{section_option.name}}</option>
+                    {% endfor %}</select><br>
+
+                <label for="add-email">Email:</label>
+                <input type="text" id="add-email" name="email"><br>
+                <label for="add-phone_number">Phone Number:</label>
+                <input type="text" id="add-phone_number" name="phone_number"><br>
+                
+                <button type="submit">Add</button>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        
+        var addButtons = document.querySelectorAll(".add-student-button");
+        var addModal = document.getElementById("addStudentModal");
+        var addcloseBtn = document.querySelector(".close-add-modal");
+        var addForm = document.getElementById("addForm");
+
+        
+        addButtons.forEach(button => {
+            button.addEventListener("click", function() {
+                
+                
+
+              
+                document.getElementById("add-name").value = "";
+                document.getElementById("add-class_name").value = "";
+                document.getElementById("add-section").value = "";
+                document.getElementById("add-email").value="";
+                document.getElementById("add-phone_number").value="";
+                
+
+                addModal.style.display = "block";
+            });
+        });
+
+        
+        addcloseBtn.addEventListener("click", function() {
+            addModal.style.display = "none";
+        });
+
+       
+        window.addEventListener("click", function(event) {
+            if (event.target === addModal) {
+                addModal.style.display = "none";
+            }
+        });
+
+        
+        addForm.addEventListener("submit", function(e) {
+            e.preventDefault();
+        
+            // const studentId = document.getElementById("student-id").value;
+            // const name = document.getElementById("name").value;
+            // const classId = document.getElementById("class_name").value;
+            // const sectionId = document.getElementById("section").value;
+            // const email = document.getElementById("email").value
+            // const phone_number=document.getElementById("phone_number").value
+
+            const name = document.getElementById("add-name").value;
+            const classId = document.getElementById("add-class_name").value;
+            const sectionId = document.getElementById("add-section").value;
+            const email = document.getElementById("add-email").value;
+            const phone_number = document.getElementById("add-phone_number").value;
+                    
+
+            const formData = new FormData();
+            
+            formData.append("name", name);
+            formData.append("class_name", classId);
+            formData.append("section", sectionId);
+            formData.append("email",email)
+            formData.append("phone_number",phone_number)
+            
+            formData.append("csrfmiddlewaretoken", document.querySelector('[name="csrfmiddlewaretoken"]').value);
+            
+
+            const request = new XMLHttpRequest();
+            request.open("POST", "{% url 'add_principal_student_ajax' %}", true);
+            request.onreadystatechange = function() {
+                if (request.readyState === XMLHttpRequest.DONE) {
+                    if (request.status === 200) 
+                    {
+                        const response = JSON.parse(request.responseText);
+                        if (response.success) 
+                        {
+                            alert("Student details added successfully");
+                            window.location.reload();  
+                        }
+                        else 
+                        {
+                            alert("Error adding student details");
+                        }
+                    } 
+                    else
+                    {
+                        alert("Error occurred while adding student");
+                    }
+                }
+            };
+            request.send(formData);
+        });
+        
+    </script>
+    <!--
+    <div id="updateClassModal" class="modal">
+        <div class="modal-content">
+            <span class="close-btn close-updateclass-modal">&times;</span>
+            <h2>Update Class</h2>
+            <form id="updateClassForm">
+                {% csrf_token %}
+
+                <input type="hidden" id="update-class-id">
+
+                <label for="update-class_name">Class:</label>
+                <input type="text" id="update-class_name" name="name"><br>
+
+                <button type="submit">Update</button>
+                
+            </form>
+        </div>
+    </div>
+
+    <script>
+
+        var updateButtons= document.querySelectorAll(".update-class-button");
+        var updateModal = document.getElementById("updateClassModal");
+        var updatecloseBtn= document.querySelector(".close-updateclass-modal");
+        var updateForm= document.getElementById("updateClassForm");
+
+        updateButtons.forEach(button =>{
+            button.addEventListener("click",
+                function() {
+                    const classId=this.dataset.id;
+                    const className=this.dataset.name;
+
+                    document.getElementById("update-class-id").value=classId;
+                    document.getElementById("update-class_name").value=className;
+
+                    updateModal.style.display="block";
+                });
+        });
+
+        updatecloseBtn.addEventListener("click",function
+            (event){
+                updateModal.style.display="none";
+        });
+
+        window.addEventListener("click", function(event) {
+            if (event.target === updateModal) {
+                updateModal.style.display = "none";
+            }
+        });
+
+        updateForm.addEventListener("submit",
+            function(e){
+                e.preventDefault();
+
+                const classId=document.getElementById("update-class-id").value;
+                const className=document.getElementById("update-class_name").value;
+
+                const formData = new FormData();
+                formData.append("id",classId);
+                formData.append("name",className);
+
+                formData.append("csrfmiddlewaretoken", document.querySelector('[name="csrfmiddlewaretoken"]').value);
+
+                const request = new XMLHttpRequest();
+                request.open("POST", "{% url 'update_principal_class_ajax' %}", true);
+                request.onreadystatechange = function() {
+                    if (request.readyState === XMLHttpRequest.DONE) {
+                        if (request.status === 200) 
+                        {
+                            const response = JSON.parse(request.responseText);
+                            if (response.success) 
+                            {
+                                alert("Class details updated successfully");
+                                window.location.reload();  
+                            }
+                            else 
+                            {
+                                alert("Error updating class details");
+                            }
+                        } 
+                        else
+                        {
+                            alert("Error occurred while updating class");
+                        }
+                    }
+                };
+                request.send(formData);
+            });
+
+            var deleteButtons = document.querySelectorAll(".delete-class-button");
+            console.log("Delete buttons found:", deleteButtons);
+
+            deleteButtons.forEach(button => {
+                button.addEventListener("click", function () {
+                    
+                    const classId = this.dataset.id; // Get the student ID from the data-id attribute
+
+                    // Ask for confirmation
+                    if (!confirm("Are you sure you want to delete this class?")) {
+                        return;
+                    }
+
+                    // CSRF token
+                    const csrfToken = document.querySelector('[name="csrfmiddlewaretoken"]').value;
+
+                    // Send the AJAX DELETE request
+                    fetch("{% url 'delete_class' 0 %}".replace('0', classId), {
+                        method: "POST",
+                        headers: {
+                            "X-CSRFToken": csrfToken,
+                            "Content-Type": "application/json"
+                        }
+                    })
+                    .then(response => {
+                        if (response.ok) {
+                            // Remove the student row from the table
+                            const classRow = button.closest("tr");
+                            classRow.remove();
+
+                            alert("Class deleted successfully!");
+                        } else {
+                            throw new Error("Failed to delete the class.");
+                        }
+                    })
+                    .catch(error => {
+                        console.error("Error:", error);
+                        alert("An error occurred while trying to delete the class.");
+                    });
+                });
+            });
+                    
+    
+
+
+    </script>
+    -->
+
+
+    
+    
+
+</body>
+</html>

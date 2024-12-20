@@ -1,0 +1,92 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Class Details - {{ class_name }}</title>
+    <link rel="stylesheet" href="{% static 'styles.css' %}">
+    
+</head>
+<body>
+    <h1>Class Details - {{ class_name.name }}  - {{ class_name.id }}</h1>
+
+    <h2>Students</h2>
+    {% if students %}
+        <table>
+            <thead>
+                <tr>
+                    <th>#</th>
+                    <th>Name</th>
+                    <th>Email</th>
+                    <th>Phone Number</th>
+                    <th>Section</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for student in students %}
+                    <tr>
+                        <td>{{ forloop.counter }}</td>
+                        <td>{{ student.user.name }}</td>
+                        <td>{{ student.user.email }}</td>
+                        <td>{{ student.user.phone_number }}</td>
+                        <td>{{ student.sections}}</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    {% else %}
+        <p>No students found in this class.</p>
+    {% endif %}
+
+    <h2>Teachers</h2>
+    {% if teachers %}
+        <table>
+            <thead>
+                <tr>
+                    <th>#</th>
+                    <th>Name</th>
+                    <th>Email</th>
+                    <th>Phone Number</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for teacher in teachers %}
+                    <tr>
+                        <td>{{ forloop.counter }}</td>
+                        <td>{{ teacher.user.name }}</td>
+                        <td>{{ teacher.user.email }}</td>
+                        <td>{{ teacher.user.phone_number }}</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    {% else %}
+        <p>No teachers found for this class.</p>
+    {% endif %}
+
+    <h2>Sections</h2>
+    {% if sections %}
+        <table>
+            <thead>
+                <tr>
+                    <th>#</th>
+                    <th>Section Name</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for section in sections %}
+                    <tr>
+                        <td>{{ forloop.counter }}</td>
+                        <td><a href="{% url 'section_students' class_name.id section.id %}" class="section-link">{{ section.name }}</a></td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        {% endif %}
+
+    <div class="button-container">
+        <a href="{% url 'principal_home' %}">Back to Principal Home</a> 
+    </div>
+</body>
+</html>
