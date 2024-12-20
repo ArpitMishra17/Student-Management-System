@@ -1,0 +1,394 @@
+/* Basic styles for the entire project */
+body {
+    font-family: Arial, sans-serif;
+    margin: 20px;
+    background-color: #f4f4f9;
+    color: #333;
+}
+
+/* Center alignment for headers */
+h1 {
+    text-align: center;
+    color: #000;
+    font-size: 50px;
+    margin: 0;
+}
+
+/* Header container for page title and user info */
+.header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background-color: #f4f4f4;
+    padding: 10px 20px;
+    border-bottom: 1px solid #ddd;
+    margin-bottom: 20px;
+}
+
+.header h1 {
+    font-size: 40px;
+    margin: 0;
+    text-align: left;
+}
+
+.user-info {
+    font-size: 16px;
+    font-weight: bold;
+    color: #333;
+    text-align: right;
+}
+
+.user-info a {
+    color: black;
+    text-decoration: none;
+    font-weight: bold;
+    transition: color 0.3s ease;
+}
+
+.user-info a:hover {
+    color: #007BFF;
+}
+
+/* Links styling */
+.button-container a {
+    background: black;
+    border: none;
+    color: white;
+    padding: 10px 20px;
+    font-size: 18px;
+    font-weight: bold;
+    cursor: pointer;
+    margin-top: 20px;
+    transition: background 0.3s ease;
+    border-radius: 8px;
+    text-decoration: none;
+}
+
+.button-container a:hover {
+    background: #bad7f5;
+    color: #121212;
+}
+
+.button-container {
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+    margin-top: 20px;
+}
+
+/* Styling for buttons */
+button {
+    background: black;
+    border: none;
+    color: white;
+    padding: 10px 20px;
+    font-size: 18px;
+    font-weight: bold;
+    cursor: pointer;
+    margin-top: 20px;
+    transition: background 0.3s ease;
+    border-radius: 8px;
+}
+
+button:hover {
+    background: #bad7f5;
+    color: #121212;
+}
+
+/* Container for forms */
+form {
+    margin: 0 auto;
+    width: 50%;
+    background: #fff;
+    padding: 20px;
+    border-radius: 5px;
+    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+/* Form fields */
+form label {
+    display: block;
+    margin-bottom: 5px;
+    font-weight: bold;
+}
+
+form input {
+    width: 100%;
+    padding: 10px;
+    margin-bottom: 15px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+}
+
+/* List styling for the user display page */
+.students-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.students-table th, .students-table td {
+    padding: 10px;
+    text-align: left;
+    border: 1px solid #ddd;
+}
+
+.students-table th {
+    background-color: #f4f4f4;
+}
+
+.display-buttons {
+    display: inline-block;
+    padding: 8px 16px;
+    margin: 5px;
+    font-size: 16px;
+    font-weight: bold;
+    color: white;
+    text-align: center;
+    text-decoration: none;
+    border-radius: 8px;
+    transition: background 0.3s ease, transform 0.2s ease;
+}
+
+/* Different colors for Update and Delete */
+.display-buttons[href*="update_student"]:hover {
+    background-color: #00A693; 
+}
+
+.display-buttons[href*="delete_student"]:hover {
+    background-color: #8d0f06; 
+}
+
+.pagination {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-top: 20px;
+    gap: 10px;
+}
+
+.pagination a {
+    text-decoration: none;
+    color: white;
+    background-color: black;
+    padding: 8px 12px;
+    border-radius: 5px;
+    transition: background 0.3s ease;
+}
+
+.pagination a:hover {
+    background-color: #bad7f5;
+    color: black;
+}
+
+.pagination span {
+    font-size: 20px;
+    margin-top: 17px;
+    font-weight: bold;
+}
+
+.student-info {
+    max-width: 500px; /* Limits the width of the container */
+    margin: 20px auto; /* Centers the div and adds vertical spacing */
+    padding: 15px; /* Adds some internal spacing */
+    border: 1px solid #ddd; /* Adds a subtle border */
+    border-radius: 8px; /* Rounds the corners */
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* Adds a subtle shadow */
+    background-color: #f9f9f9; /* Sets a light background color */
+}
+
+.student-info ul {
+    list-style-type: none; /* Removes default bullet points */
+    padding: 0; /* Removes default padding */
+    margin: 0; /* Removes default margin */
+}
+
+.student-info li {
+    font-size: 16px; /* Sets the font size */
+    line-height: 1.6; /* Adds spacing between lines */
+    margin-bottom: 10px; /* Adds spacing between list items */
+    color: #333; /* Sets text color */
+}
+
+
+
+.student-info div ul li:last-child {
+    margin-bottom: 0; /* Removes the margin for the last list item */
+}
+/* Modal styles */
+.modal {
+    display: none; 
+    position: fixed; 
+    z-index: 1; 
+    left: 0;
+    top: 0;
+    width: 100%; 
+    height: 100%; 
+    background-color: rgba(0, 0, 0, 0.4); 
+    overflow: auto; 
+    padding-top: 60px;
+}
+
+.modal-content {
+    background-color: #fefefe;
+    margin: 5% auto;
+    padding: 20px;
+    border: 1px solid #888;
+    width: 80%;
+}
+
+.close-btn {
+    color: #aaa;
+    float: right;
+    font-size: 28px;
+    font-weight: bold;
+}
+
+.close-btn:hover,
+.close-btn:focus {
+    color: black;
+    text-decoration: none;
+    cursor: pointer;
+}
+
+form input, form button {
+    width: 100%;
+    padding: 10px;
+    margin-bottom: 15px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+}
+
+.update-button{
+    display: inline-block;
+    padding: 8px 16px;
+    margin: 5px;
+    font-size: 16px;
+    font-weight: bold;
+    color: white;
+    text-align: center;
+    text-decoration: none;
+    border-radius: 8px;
+    transition: background 0.3s ease, transform 0.2s ease;
+}
+
+.update-button:hover{
+    background-color: #00A693; 
+    color: white;
+}
+
+.add-button {
+    background: black;
+    border: none;
+    color: white;
+    padding: 5px 15px;
+    font-size: 18px;
+    font-weight: bold;
+    cursor: pointer;
+    margin-top: 20px;
+    margin-left: 20px;
+    transition: background 0.3s ease;
+    border-radius: 8px;
+}
+
+.add-button:hover {
+    background: #bad7f5;
+    color: #121212;
+}
+
+
+
+.delete-button{
+    display: inline-block;
+    padding: 8px 16px;
+    margin: 5px;
+    font-size: 16px;
+    font-weight: bold;
+    color: white;
+    text-align: center;
+    text-decoration: none;
+    border-radius: 8px;
+    transition: background 0.3s ease, transform 0.2s ease;
+}
+
+.delete-button:hover{
+    background-color: #8d0f06; 
+    color: white;
+}
+
+.delete-student-button{
+    display: inline-block;
+    padding: 8px 16px;
+    margin: 5px;
+    font-size: 16px;
+    font-weight: bold;
+    color: white;
+    text-align: center;
+    text-decoration: none;
+    border-radius: 8px;
+    transition: background 0.3s ease, transform 0.2s ease;
+}
+
+.delete-student-button:hover{
+    background-color: #8d0f06; 
+    color: white;
+}
+
+
+.principal-info{
+    max-width: 500px; /* Limits the width of the container */
+    margin: 20px auto; /* Centers the div and adds vertical spacing */
+    padding: 15px; /* Adds some internal spacing */
+    border: 1px solid #ddd; /* Adds a subtle border */
+    border-radius: 8px; /* Rounds the corners */
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* Adds a subtle shadow */
+    background-color: #f9f9f9; /* Sets a light background color */
+}
+
+.principal-info ul {
+    list-style-type: none; /* Removes default bullet points */
+    padding: 0; /* Removes default padding */
+    margin: 0; /* Removes default margin */
+}
+
+.principal-info li {
+    font-size: 16px; /* Sets the font size */
+    line-height: 1.6; /* Adds spacing between lines */
+    margin-bottom: 10px; /* Adds spacing between list items */
+    color: #333; /* Sets text color */
+}
+
+
+
+.principal-info div ul li:last-child {
+    margin-bottom: 0; /* Removes the margin for the last list item */
+}
+
+.principal-info li a{
+    text-decoration: none;
+    color:#000;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+th,  td {
+    padding: 10px;
+    text-align: left;
+    border: 1px solid #ddd;
+}
+
+th {
+    background-color: #f4f4f4;
+}
+
+.class-link{
+    text-decoration: underline;
+    color:#000;
+}
+
+.section-link{
+    text-decoration: underline;
+    color:#000;
+}

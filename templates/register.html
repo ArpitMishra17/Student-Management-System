@@ -1,0 +1,31 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>{% if is_update %}Update User{% else %}Register{% endif %}</title>
+    <link rel="stylesheet" href="{% static 'styles.css' %}">
+</head>
+<body>
+    <h1>{% if is_update %}Update User{% else %}Register{% endif %}</h1>
+    <form method="POST">
+        {% csrf_token %} 
+        <label>Name</label>
+        <input type="text" placeholder="Enter Name " name="student_name" value="{{student.user.name}}">
+        <label>Age</label>
+        <input type="text" placeholder="Enter Age " name="student_age" value="{{student.user.age}}">
+        <label>Email</label>
+        <input type="text" placeholder="Enter email address " name="student_email" value="{{student.user.email}}">
+        <label>Phone Number</label>
+        <input type="text" placeholder="Enter Phone Number " name="student_phone" value="{{student.user.phone_number}}">
+        <button type="submit">{% if is_update %}Update{% else %}Register{% endif %}</button>
+    </form>
+    <div class="button-container">
+        {% if is_update %}
+            <a href="{% url 'display_students' %}">Back to Student List</a>
+        {% else %}
+            <a href="{% url 'home' %}">Back to Home</a>
+        {% endif %}
+        
+    </div>
+</body>
+</html>

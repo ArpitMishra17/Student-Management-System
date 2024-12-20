@@ -1,0 +1,48 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Student Home</title>
+    <link rel="stylesheet" href="{% static 'styles.css' %}">
+</head>
+<body>
+    <div class="header">
+    <h1>Welcome Student</h1>
+    <div class="user-info">
+        Logged in as : {{student.user.name}}
+    </div>
+    </div>
+    <div class="student-info">
+        {% if student.profile_picture %}
+            <img src="{{ student.profile_picture.url }}" alt="Profile Picture" style="width: 120px; height: 120px; border-radius: 50%; margin-bottom: 10px;">
+        {% else %}
+            <img src="{% static 'default-profile.png' %}" alt="Default Profile Picture" style="width: 120px; height: 120px; border-radius: 50%; margin-bottom: 10px;">
+        {% endif %}
+        <ul>
+            <li>Name : {{student.user.name}}</li>
+            <li>Age : {{student.user.age}}</li>
+            <li>Email : {{student.user.email}}</li>
+            <li>Phone number : {{student.user.phone_number}}</li>
+            <li>Aadhar : {{student.aadhar}}</li>
+            <li>Address : {{student.address}}</li>
+            <li>Class-Section : {{student.class_name}}-{{student.sections}}</li>
+            <li>Subjects : 
+            {% for subject in student.subjects.all %}
+            {{ subject.name }}
+            {% endfor %}
+            </li>
+            <li>Periods : 
+                {% for period in student.periods.all %}
+                {{ period.subject.name }}-{{ period.start_time }} - {{ period.end_time }}
+                {% endfor %}
+                </li>
+        </ul>
+    </div>
+    <div class="button-container">
+        <a href="{% url 'update_details' %}">Update Details</a> 
+    </div>
+    <div class="button-container">
+        <a href="{% url 'user_login' %}">Logout</a>
+    </div>
+</body>
+</html>
