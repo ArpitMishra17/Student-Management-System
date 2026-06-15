@@ -10,6 +10,7 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/5.1/ref/settings/
 """
 
+import os
 from pathlib import Path
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -20,10 +21,10 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/5.1/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-a+b^hdhcmf71*5&2^ffgcmr20)n$2$un(^mcz$yi#5%z&5f3xh'
+SECRET_KEY = os.environ.get('SECRET_KEY', 'django-insecure-a+b^hdhcmf71*5&2^ffgcmr20)n$2$un(^mcz$yi#5%z&5f3xh')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = os.environ.get('DEBUG', 'True') == 'True'
 
 ALLOWED_HOSTS = []
 
@@ -53,7 +54,6 @@ MIDDLEWARE = [
 
 ROOT_URLCONF = 'studentdb.urls'
 
-import os
 
 TEMPLATES_DIR= os.path.join(BASE_DIR,'templates')
 STATIC_DIR= os.path.join(BASE_DIR, 'static')
@@ -85,7 +85,7 @@ DATABASES = {
         'ENGINE': 'django.db.backends.mysql',
         'NAME': 'my_database',
         'USER': 'root',
-        'PASSWORD': 'password123',
+        'PASSWORD': os.environ.get('DB_PASSWORD', ''),
         'HOST':'127.0.0.1',
         'PORT':'3306',
         'OPTIONS':{
