@@ -11,9 +11,6 @@ def user_login(request):
         user_email=request.POST.get('user_email',None)
         user_password=request.POST.get('user_password',None)
 
-        print("user_email" , user_email)
-        print("user_password" , user_password)
-
         user=authenticate(request,email=user_email, password=user_password)
 
 
@@ -55,8 +52,6 @@ def register(request):
         for i in range(0,4):
             st_password+=st_nm[i]
         st_password+="@123"
-
-        print("st_password" , st_password)
 
         user = NewUsers.objects.create(name = st_nm,age=st_age,email=st_email,phone_number=st_phone,password=st_password)
 
