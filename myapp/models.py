@@ -1,7 +1,5 @@
 from django.db import models
-from django.contrib.auth.hashers import make_password, check_password
-from django.core.exceptions import ValidationError
-from django.contrib.auth.models import AbstractUser,AbstractBaseUser, PermissionsMixin, BaseUserManager
+from django.contrib.auth.models import AbstractBaseUser, PermissionsMixin, BaseUserManager
 from django.core.validators import FileExtensionValidator
 
 # Create your models here.
@@ -26,7 +24,7 @@ class CustomAccountManager(BaseUserManager):
 
     def create_user(self,email, password, **other_fields):
         if not email:
-            raise ValueError(_('You must provide an email'))
+            raise ValueError('You must provide an email')
 
         email = self.normalize_email(email)
         user = self.model( email=email,
@@ -42,7 +40,6 @@ class NewUsers(AbstractBaseUser, PermissionsMixin):
     name = models.CharField(max_length=100)
     age = models.PositiveIntegerField(null=True, blank=True)
     phone_number = models.CharField(max_length=13, unique=True, null=True, blank=True)
-    password = models.CharField(max_length=128, null=True, blank=True)
 
     # Permissions fields
     is_staff = models.BooleanField(default=False)  
