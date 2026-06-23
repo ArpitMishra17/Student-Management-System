@@ -3,6 +3,7 @@ from .models import Student, Teacher, NewUsers,Principal,Class_name,Section,Subj
 from django.core.paginator import Paginator
 from django.contrib.auth import login, authenticate
 from django.contrib.auth.decorators import login_required
+from urllib.parse import urlencode
 
 def user_login(request):
     if request.method == 'POST':
@@ -71,14 +72,40 @@ def register(request):
 
 
 def display_students(request):
-    student = Student.objects.all()
+    # Read filter parameters from the query string.
+    q = request.GET.get('q', '').strip()
+    class_id = request.GET.get('class', '')
 
-    paginator=Paginator(student,6)
+    students = Student.objects.all()
+    if q:
+        students = students.filter(user__name__icontains=q)
+    if class_id.isdigit():
+        students = students.filter(class_name_id=int(class_id))
+    # Stable ordering avoids inconsistent pagination results.
+    students = students.order_by('id')
 
-    page_number= request.GET.get('page')
-    page_obj=paginator.get_page(page_number)
+    paginator = Paginator(students, 6)
+    page_obj = paginator.get_page(request.GET.get('page'))
 
-    return render(request, 'display_students.html', {'page_obj':page_obj})
+    # Build a querystring (without `page`) so pagination links preserve the
+    # active filters. Trailing '&' (or empty string) keeps the template simple.
+    params = {}
+    if q:
+        params['q'] = q
+    if class_id:
+        params['class'] = class_id
+    filter_querystring = urlencode(params)
+    if filter_querystring:
+        filter_querystring += '&'
+
+    context = {
+        'page_obj': page_obj,
+        'classes': Class_name.objects.all(),
+        'q': q,
+        'selected_class': class_id,
+        'filter_querystring': filter_querystring,
+    }
+    return render(request, 'display_students.html', context)
 
 def delete_student(request, student_id):
     if request.method == 'POST':  # Only allow POST requests for delete
