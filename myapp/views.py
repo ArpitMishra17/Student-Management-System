@@ -71,14 +71,29 @@ def register(request):
 
 
 def display_students(request):
-    student = Student.objects.all()
+    q = request.GET.get('q', '').strip()
+    students = Student.objects.filter(user__name__icontains=q) if q else Student.objects.all()
+    students = students.order_by('id')
 
-    paginator=Paginator(student,6)
+    paginator = Paginator(students, 6)
 
-    page_number= request.GET.get('page')
-    page_obj=paginator.get_page(page_number)
+    page_number = request.GET.get('page')
+    page_obj = paginator.get_page(page_number)
 
-    return render(request, 'display_students.html', {'page_obj':page_obj})
+    return render(request, 'display_students.html', {'page_obj': page_obj, 'q': q})
+
+
+def search_students(request):
+    """AJAX endpoint: returns the student table fragment filtered by name."""
+    q = request.GET.get('q', '').strip()
+    students = Student.objects.filter(user__name__icontains=q) if q else Student.objects.all()
+    students = students.order_by('id')
+
+    paginator = Paginator(students, 6)
+    page_number = request.GET.get('page')
+    page_obj = paginator.get_page(page_number)
+
+    return render(request, '_students_table.html', {'page_obj': page_obj, 'q': q})
 
 def delete_student(request, student_id):
     if request.method == 'POST':  # Only allow POST requests for delete

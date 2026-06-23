@@ -1,0 +1,45 @@
+{# Reusable student table + pagination fragment.
+   Rendered by display_students (full page) and search_students (AJAX). #}
+<table border="1" class="students-table">
+    <thead>
+        <tr>
+            <th>ID</th>
+            <th>Name</th>
+            <th>Age</th>
+            <th>Email</th>
+            <th>Phone number</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for student in page_obj %}
+        <tr>
+            <td>{{ student.user.id }}</td>
+            <td>{{ student.user.name }}</td>
+            <td>{{ student.user.age }}</td>
+            <td>{{ student.user.email }}</td>
+            <td>{{ student.user.phone_number }}</td>
+            <td> <button class="update-button" data-id="{{ student.id }}" data-name="{{ student.user.name }}" data-age="{{ student.user.age }}" data-email="{{ student.user.email }}" data-phone="{{ student.user.phone_number }}">
+                    Update
+                </button>
+            </td>
+            <td>
+                <button class="delete-button" data-id="{{ student.id }}">
+                    Delete
+                </button>
+            </td>
+        </tr>
+        {% empty %}
+        <tr><td colspan="7">No students found</td></tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+<div class="pagination">
+    {% if page_obj.has_previous %}
+        <a class="button-container" href="?{% if q %}q={{ q|urlencode }}&{% endif %}page={{ page_obj.previous_page_number }}">Previous</a>
+    {% endif %}
+    <span>Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}</span>
+    {% if page_obj.has_next %}
+        <a class="button-container" href="?{% if q %}q={{ q|urlencode }}&{% endif %}page={{ page_obj.next_page_number }}">Next</a>
+    {% endif %}
+</div>

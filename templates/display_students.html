@@ -9,46 +9,13 @@
     <h1>Registered Students</h1>
     
 
-    <table  border="1" class="students-table">
-        <thead>
-            <tr>
-                <th>ID</th>
-                <th>Name</th>
-                <th>Age</th>
-                <th>Email</th>
-                <th>Phone number</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for student in page_obj %}
-            <tr>
-                <td>{{ student.user.id }}</td>
-                <td>{{ student.user.name }}</td>
-                <td>{{ student.user.age }}</td>
-                <td>{{ student.user.email }}</td>
-                <td>{{ student.user.phone_number }}</td>
-                <td> <button class="update-button" data-id="{{ student.id }}" data-name="{{ student.user.name }}" data-age="{{ student.user.age }}" data-email="{{ student.user.email }}" data-phone="{{ student.user.phone_number }}">
-                        Update
-                    </button>
-                </td>
-                <td>
-                    <button class="delete-button" data-id="{{ student.id }}">
-                        Delete
-                    </button>
-                </td>
-            </tr>
-            {% endfor %}
-        </tbody>
-    </table>
+    <form id="search-form" role="search" class="search-container">
+        <input type="text" id="search-input" name="q" value="{{ q }}" placeholder="Search students by name..." autocomplete="off">
+        <button type="submit">Search</button>
+    </form>
 
-    <div class="pagination">
-        {% if page_obj.has_previous %}
-            <a class="button-container" href="?page={{page_obj.previous_page_number}}">Previous</a>
-        {% endif %}
-        <span>Page {{ page_obj.number}} of {{page_obj.paginator.num_pages}}</span>
-        {% if page_obj.has_next %}
-            <a class="button-container" href="?page={{page_obj.next_page_number}}">Next</a>
-        {% endif %}
+    <div id="students-wrapper">
+        {% include '_students_table.html' %}
     </div>
     
     <div class="button-container">
@@ -76,80 +43,97 @@
         </div>
     </div>
     <script>
-        
-        const updateButtons = document.querySelectorAll(".update-button");
         const modal = document.getElementById("updateModal");
         const closeBtn = document.querySelector(".close-btn");
         const updateForm = document.getElementById("updateForm");
+        const wrapper = document.getElementById("students-wrapper");
+        const searchInput = document.getElementById("search-input");
+        const searchForm = document.getElementById("search-form");
 
-        
-        updateButtons.forEach(button => {
-            button.addEventListener("click", function() {
-                const studentId = this.dataset.id;
-                const name = this.dataset.name;
-                const age = this.dataset.age;
-                const email = this.dataset.email;
-                const phone = this.dataset.phone;
-
-                document.getElementById("student-id").value = studentId;
-                document.getElementById("name").value = name;
-                document.getElementById("age").value = age;
-                document.getElementById("email").value = email;
-                document.getElementById("phone").value = phone;
-
-                modal.style.display = "block";
+        // Bind Update/Delete handlers to the rows currently in the table.
+        // Called on load and again after each AJAX search swap so freshly
+        // rendered rows behave identically to the server-rendered ones.
+        function bindRowButtons() {
+            document.querySelectorAll(".update-button").forEach(button => {
+                button.addEventListener("click", function() {
+                    document.getElementById("student-id").value = this.dataset.id;
+                    document.getElementById("name").value = this.dataset.name;
+                    document.getElementById("age").value = this.dataset.age;
+                    document.getElementById("email").value = this.dataset.email;
+                    document.getElementById("phone").value = this.dataset.phone;
+                    modal.style.display = "block";
+                });
             });
-        });
 
-        
+            document.querySelectorAll(".delete-button").forEach(button => {
+                button.addEventListener("click", function () {
+                    const studentId = this.dataset.id;
+
+                    if (!confirm("Are you sure you want to delete this student?")) {
+                        return;
+                    }
+
+                    const csrfToken = document.querySelector('[name="csrfmiddlewaretoken"]').value;
+
+                    fetch("{% url 'delete_student' 0 %}".replace('0', studentId), {
+                        method: "POST",
+                        headers: {
+                            "X-CSRFToken": csrfToken,
+                            "Content-Type": "application/json"
+                        }
+                    })
+                    .then(response => {
+                        if (response.ok) {
+                            button.closest("tr").remove();
+                            alert("Student deleted successfully!");
+                        } else {
+                            throw new Error("Failed to delete the student.");
+                        }
+                    })
+                    .catch(error => {
+                        console.error("Error:", error);
+                        alert("An error occurred while trying to delete the student.");
+                    });
+                });
+            });
+        }
+
+        // Modal close handlers (bound once — the modal persists across swaps).
         closeBtn.addEventListener("click", function() {
             modal.style.display = "none";
         });
 
-       
         window.addEventListener("click", function(event) {
             if (event.target === modal) {
                 modal.style.display = "none";
             }
         });
 
-        
+        // Update form submit (XHR to update_student_ajax).
         updateForm.addEventListener("submit", function(e) {
             e.preventDefault();
 
-            const studentId = document.getElementById("student-id").value;
-            const name = document.getElementById("name").value;
-            const age = document.getElementById("age").value;
-            const email = document.getElementById("email").value;
-            const phone = document.getElementById("phone").value;
-
             const formData = new FormData();
-            formData.append("student_id", studentId);
-            formData.append("name", name);
-            formData.append("age", age);
-            formData.append("email", email);
-            formData.append("phone", phone);
+            formData.append("student_id", document.getElementById("student-id").value);
+            formData.append("name", document.getElementById("name").value);
+            formData.append("age", document.getElementById("age").value);
+            formData.append("email", document.getElementById("email").value);
+            formData.append("phone", document.getElementById("phone").value);
             formData.append("csrfmiddlewaretoken", document.querySelector('[name="csrfmiddlewaretoken"]').value);
 
             const request = new XMLHttpRequest();
             request.open("POST", "{% url 'update_student_ajax' %}", true);
             request.onreadystatechange = function() {
                 if (request.readyState === XMLHttpRequest.DONE) {
-                    if (request.status === 200) 
-                    {
+                    if (request.status === 200) {
                         const response = JSON.parse(request.responseText);
-                        if (response.success) 
-                        {
+                        if (response.success) {
                             alert("Student details updated successfully");
-                            window.location.reload();  
-                        }
-                        else 
-                        {
+                            window.location.reload();
+                        } else {
                             alert("Error updating student details");
                         }
-                    } 
-                    else
-                    {
+                    } else {
                         alert("Error occurred while updating student");
                     }
                 }
@@ -157,50 +141,32 @@
             request.send(formData);
         });
 
-                    // Add event listeners to all delete buttons
-        const deleteButtons = document.querySelectorAll(".delete-button");
-        console.log("Delete buttons found:", deleteButtons);
-
-        deleteButtons.forEach(button => {
-            button.addEventListener("click", function () {
-                
-                const studentId = this.dataset.id; // Get the student ID from the data-id attribute
-
-                // Ask for confirmation
-                if (!confirm("Are you sure you want to delete this student?")) {
-                    return;
-                }
-
-                // CSRF token
-                const csrfToken = document.querySelector('[name="csrfmiddlewaretoken"]').value;
-
-                // Send the AJAX DELETE request
-                fetch("{% url 'delete_student' 0 %}".replace('0', studentId), {
-                    method: "POST",
-                    headers: {
-                        "X-CSRFToken": csrfToken,
-                        "Content-Type": "application/json"
-                    }
+        // Inline name search: fetch the filtered table fragment and swap it in.
+        let searchTimer = null;
+        function performSearch() {
+            const q = searchInput.value.trim();
+            const url = "{% url 'search_students' %}?q=" + encodeURIComponent(q);
+            fetch(url)
+                .then(response => response.text())
+                .then(html => {
+                    wrapper.innerHTML = html;
+                    bindRowButtons();
                 })
-                .then(response => {
-                    if (response.ok) {
-                        // Remove the student row from the table
-                        const studentRow = button.closest("tr");
-                        studentRow.remove();
+                .catch(error => console.error("Search failed:", error));
+        }
 
-                        alert("Student deleted successfully!");
-                    } else {
-                        throw new Error("Failed to delete the student.");
-                    }
-                })
-                .catch(error => {
-                    console.error("Error:", error);
-                    alert("An error occurred while trying to delete the student.");
-                });
-      });
-});
+        searchInput.addEventListener("input", function() {
+            clearTimeout(searchTimer);
+            searchTimer = setTimeout(performSearch, 300);
+        });
 
-        
+        searchForm.addEventListener("submit", function(e) {
+            e.preventDefault();
+            performSearch();
+        });
+
+        // Initial bind for the server-rendered rows.
+        bindRowButtons();
     </script>
 </body>
 </html>
