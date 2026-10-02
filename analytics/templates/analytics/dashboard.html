@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+{% comment %}
+Standalone page: the project has no shared base.html, so this template carries
+its own markup and styling rather than extending one.
+{% endcomment %}
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Attendance Analytics — Student Management System</title>
+<style>
+  body { font-family: system-ui, -apple-system, "Segoe UI", sans-serif; margin: 0; color: #111827; background: #f9fafb; }
+  :root {
+    --ok: #16a34a;
+    --watch: #ca8a04;
+    --high: #ea580c;
+    --critical: #dc2626;
+  }
+  .wrap { max-width: 1100px; margin: 0 auto; padding: 24px 16px 64px; }
+  .cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: 14px; }
+  .card { border: 1px solid #e5e7eb; border-radius: 10px; padding: 14px 16px; background: #fff; }
+  .card .k { font-size: 12px; letter-spacing: .04em; text-transform: uppercase; color: #6b7280; }
+  .card .v { font-size: 28px; font-weight: 700; margin-top: 4px; }
+  table { border-collapse: collapse; width: 100%; margin-top: 16px; }
+  th, td { text-align: left; padding: 8px 10px; border-bottom: 1px solid #f3f4f6; font-size: 14px; }
+  th { font-size: 12px; text-transform: uppercase; color: #6b7280; letter-spacing: .04em; }
+  .band { font-weight: 600; }
+  .band.ok { color: var(--ok); }
+  .band.watch { color: var(--watch); }
+  .band.high { color: var(--high); }
+  .band.critical { color: var(--critical); }
+  .bar { position: relative; height: 8px; border-radius: 999px; background: #f3f4f6; overflow: hidden; min-width: 120px; }
+  .bar > span { display: block; height: 100%; background: var(--ok); }
+  .locked { color: var(--critical); font-weight: 600; }
+  h2 { margin-top: 36px; font-size: 18px; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>Attendance Analytics</h1>
+  <p>Term: <strong id="term-label">{{ term.code }}</strong> — <span id="term-label-text">{{ term.label }}</span>
+     {% if term.is_locked %}<span class="locked">(locked)</span>{% endif %}
+  </p>
+
+  <div class="cards">
+    <div class="card"><div class="k">Students tracked</div><div class="v" id="stat-students">—</div></div>
+    <div class="card"><div class="k">Sessions</div><div class="v" id="stat-sessions">—</div></div>
+    <div class="card"><div class="k">At risk</div><div class="v" id="stat-risk">—</div></div>
+  </div>
+
+  <h2>Students needing attention</h2>
+  <table>
+    <thead>
+      <tr><th>Student</th><th>Attendance</th><th>Risk band</th><th></th></tr>
+    </thead>
+    <tbody id="risk-body">
+      <tr><td colspan="4">Loading…</td></tr>
+    </tbody>
+  </table>
+
+  <h2>Class / subject heatmap</h2>
+  <table>
+    <thead>
+      <tr><th>Class</th><th>Subject</th><th>Sessions</th><th>Attendance</th></tr>
+    </thead>
+    <tbody id="heatmap-body">
+      <tr><td colspan="4">Loading…</td></tr>
+    </tbody>
+  </table>
+</div>
+
+<script>
+  const TERM_CODE = "{{ term.code|escapejs }}";
+
+  const pct = (n) => `${Number(n).toFixed(1)}%`;
+  const esc = (s) => String(s ?? "").replace(/[&<>"']/g, (c) => (
+    { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]
+  ));
+
+  function renderRisk(rows) {
+    const body = document.getElementById("risk-body");
+    if (!rows.length) {
+      body.innerHTML = '<tr><td colspan="4">No students are currently at risk.</td></tr>';
+      return;
+    }
+    body.innerHTML = rows.map((r) => `
+      <tr>
+        <td>${esc(r.student)}</td>
+        <td>${pct(r.percentage)}</td>
+        <td class="band ${esc(r.risk_band)}">${esc(r.risk_band)}</td>
+        <td><div class="bar"><span style="width:${Math.max(0, Math.min(100, r.percentage))}%"></span></div></td>
+      </tr>
+    `).join("");
+  }
+
+  function renderHeatmap(heatmap) {
+    const rows = [];
+    Object.entries(heatmap).forEach(([className, subjects]) => {
+      Object.entries(subjects).forEach(([subject, data]) => rows.push({ className, subject, ...data }));
+    });
+    const body = document.getElementById("heatmap-body");
+    if (!rows.length) {
+      body.innerHTML = '<tr><td colspan="4">No sessions recorded for this term yet.</td></tr>';
+      return;
+    }
+    body.innerHTML = rows.map((r) => `
+      <tr>
+        <td>${esc(r.className)}</td>
+        <td>${esc(r.subject)}</td>
+        <td>${r.sessions}</td>
+        <td>${pct(r.percentage)}</td>
+      </tr>
+    `).join("");
+  }
+
+  fetch(`/analytics/?term=${encodeURIComponent(TERM_CODE)}`, { headers: { Accept: "application/json" } })
+    .then((res) => res.json())
+    .then((data) => {
+      if (data.error) throw new Error(data.error);
+      document.getElementById("stat-students").textContent = data.totals.students_tracked;
+      document.getElementById("stat-sessions").textContent = data.totals.sessions;
+      document.getElementById("stat-risk").textContent = data.totals.at_risk;
+      renderRisk(data.at_risk);
+      renderHeatmap(data.heatmap);
+    })
+    .catch((err) => {
+      document.getElementById("risk-body").innerHTML =
+        `<tr><td colspan="4">Could not load analytics: ${esc(err.message)}</td></tr>`;
+    });
+</script>
